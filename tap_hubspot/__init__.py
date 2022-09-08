@@ -70,6 +70,8 @@ ENDPOINTS = {
     "line_items_v3_properties":   "/crm/v3/properties/line_items",
     "line_items_v3_batch_reads":  "/crm/v3/objects/line_items/batch/read",
 
+    "associations_line_items_deals_v3":  "/crm/v3/objects/line_items",
+
     "products_all":             "/crm-objects/v1/objects/products/paged",
     "products_properties":      "/properties/v1/products/properties",
     "products_v3_properties":   "/crm/v3/properties/products",
@@ -472,6 +474,27 @@ def get_v3_deals(v3_fields, v1_data):
     v3_url = get_url('deals_v3_batch_read')
     v3_resp = post_search_endpoint(v3_url, v3_body)
     return v3_resp.json()['results']
+
+def gen_request_v3(STATE, tap_stream_id, url, params, path):
+    if singer.get_offset(STATE, tap_stream_id):
+        params.update(singer.get_offset(STATE, tap_stream_id))
+    
+    with metrics.record_counter(tap_stream_id) as counter:
+        while True:
+            data = request(url, params).json()
+
+            if data.get(path) is None:
+                raise RuntimeError("Unexpected API response: {} not in {}".format(path, data.keys()))
+
+            for row in data[path]:
+                counter.increment()
+                yield row
+
+            STATE = singer.clear_offset(STATE, tap_stream_id)
+            singer.write_state(STATE)
+
+    STATE = singer.clear_offset(STATE, tap_stream_id)
+    singer.write_state(STATE)
 
 #pylint: disable=line-too-long
 def gen_request(STATE, tap_stream_id, url, params, path, more_key, offset_keys, offset_targets, v3_fields=None):
@@ -1097,6 +1120,35 @@ def sync_products(STATE, ctx):
     singer.write_state(STATE)
     return STATE
 
+def sync_associations_line_items_deals_v3(STATE, ctx):
+    catalog = ctx.get_catalog_from_id(singer.get_currently_syncing(STATE))
+    mdata = metadata.to_map(catalog.get('metadata'))
+    schema = load_schema("associations_line_items_deals_v3")
+    bookmark_key = 'updatedAt'
+    singer.write_schema("associations_line_items_deals_v3", schema, ["id"], [bookmark_key], catalog.get('stream_alias'))
+    start = get_start(STATE, "associations_line_items_deals_v3", bookmark_key)
+    max_bk_value = start
+
+    STATE = singer.write_bookmark(STATE, 'associations_line_items_deals_v3', bookmark_key, max_bk_value)
+    singer.write_state(STATE)
+
+    LOGGER.info("sync_associations_line_items_deals_v3 from %s", start)
+    params = {"associations": "deals", "properties": [], "limit": 100}    
+    time_extracted = utils.now()
+
+    url = get_url('associations_line_items_deals_v3')
+    with Transformer(UNIX_MILLISECONDS_INTEGER_DATETIME_PARSING) as bumble_bee:
+        for row in gen_request_v3(STATE, 'associations_line_items_deals_v3', url, params, 'results'):
+            modified_time = None            
+            if modified_time and modified_time >= max_bk_value:
+                max_bk_value = modified_time
+            if not modified_time or modified_time >= start:                
+                singer.write_record("associations_line_items_deals_v3", row, catalog.get('stream_alias'), time_extracted=utils.now())
+
+    STATE = singer.write_bookmark(STATE, 'associations_line_items_deals_v3', bookmark_key, utils.strftime(max_bk_value))
+    singer.write_state(STATE)
+    return STATE
+
 def sync_line_items(STATE, ctx):
     catalog = ctx.get_catalog_from_id(singer.get_currently_syncing(STATE))
     mdata = metadata.to_map(catalog.get('metadata'))
@@ -1180,6 +1232,7 @@ STREAMS = [
     Stream('contacts', sync_contacts, ["vid"], 'versionTimestamp', 'INCREMENTAL'),
 
     # # Do these last as they are full table
+    Stream('associations_line_items_deals_v3', sync_associations_line_items_deals_v3, ['id'], 'updatedAt', 'FULL_TABLE'),
     Stream('line_items', sync_line_items, ['id'], 'hs_lastmodifieddate', 'FULL_TABLE'),
     Stream('products', sync_products, ['id'], 'hs_lastmodifieddate', 'FULL_TABLE'),
     Stream('forms', sync_forms, ['guid'], 'updatedAt', 'FULL_TABLE'),
