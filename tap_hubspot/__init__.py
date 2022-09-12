@@ -1133,7 +1133,7 @@ def sync_associations_line_items_deals_v3(STATE, ctx):
     singer.write_state(STATE)
 
     LOGGER.info("sync_associations_line_items_deals_v3 from %s", start)
-    params = {"associations": "deals", "properties": [], "limit": 100}    
+    params = {"associations": "deals", "limit": 100}    
     time_extracted = utils.now()
 
     url = get_url('associations_line_items_deals_v3')
