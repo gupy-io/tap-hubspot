@@ -1143,7 +1143,8 @@ def sync_associations_line_items_deals_v3(STATE, ctx):
             if modified_time and modified_time >= max_bk_value:
                 max_bk_value = modified_time
             if not modified_time or modified_time >= start:                
-                singer.write_record("associations_line_items_deals_v3", row, catalog.get('stream_alias'), time_extracted=utils.now())
+                record = bumble_bee.transform(row, schema, mdata)
+                singer.write_record("associations_line_items_deals_v3", record, catalog.get('stream_alias'), time_extracted=utils.now())
 
     STATE = singer.write_bookmark(STATE, 'associations_line_items_deals_v3', bookmark_key, utils.strftime(max_bk_value))
     singer.write_state(STATE)
