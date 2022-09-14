@@ -17,6 +17,7 @@ from singer import metadata
 from singer import utils
 from singer import (transform,
                     UNIX_MILLISECONDS_INTEGER_DATETIME_PARSING,
+                    NO_INTEGER_DATETIME_PARSING,                
                     Transformer, _transform_datetime)
 
 LOGGER = singer.get_logger()
@@ -482,6 +483,7 @@ def gen_request_v3(STATE, tap_stream_id, url, params, path):
     with metrics.record_counter(tap_stream_id) as counter:
         while True:
             data = request(url, params).json()
+            next_page = data.get("paging")
 
             if data.get(path) is None:
                 raise RuntimeError("Unexpected API response: {} not in {}".format(path, data.keys()))
@@ -489,6 +491,11 @@ def gen_request_v3(STATE, tap_stream_id, url, params, path):
             for row in data[path]:
                 counter.increment()
                 yield row
+            
+            if next_page == None:
+                break
+            else:    
+                params["after"] = data.get("paging").get('next').get('after')
 
             STATE = singer.clear_offset(STATE, tap_stream_id)
             singer.write_state(STATE)
@@ -506,7 +513,7 @@ def gen_request(STATE, tap_stream_id, url, params, path, more_key, offset_keys, 
 
     with metrics.record_counter(tap_stream_id) as counter:
         while True:
-            data = request(url, params).json()
+            data = request(url, params).json()            
 
             if data.get(path) is None:
                 raise RuntimeError("Unexpected API response: {} not in {}".format(path, data.keys()))
@@ -1133,11 +1140,10 @@ def sync_associations_line_items_deals_v3(STATE, ctx):
     singer.write_state(STATE)
 
     LOGGER.info("sync_associations_line_items_deals_v3 from %s", start)
-    params = {"associations": "deals", "limit": 100}    
-    time_extracted = utils.now()
+    params = {"associations": "deals", "limit": 100}
 
     url = get_url('associations_line_items_deals_v3')
-    with Transformer(UNIX_MILLISECONDS_INTEGER_DATETIME_PARSING) as bumble_bee:
+    with Transformer(NO_INTEGER_DATETIME_PARSING) as bumble_bee:
         for row in gen_request_v3(STATE, 'associations_line_items_deals_v3', url, params, 'results'):
             modified_time = None            
             if modified_time and modified_time >= max_bk_value:
@@ -1146,7 +1152,7 @@ def sync_associations_line_items_deals_v3(STATE, ctx):
                 record = bumble_bee.transform(row, schema, mdata)
                 singer.write_record("associations_line_items_deals_v3", record, catalog.get('stream_alias'), time_extracted=utils.now())
 
-    STATE = singer.write_bookmark(STATE, 'associations_line_items_deals_v3', bookmark_key, utils.strftime(max_bk_value))
+    STATE = singer.write_bookmark(STATE, 'associations_line_items_deals_v3', bookmark_key, max_bk_value)
     singer.write_state(STATE)
     return STATE
 
