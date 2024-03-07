@@ -522,6 +522,9 @@
         "tipo_da_negociacao": {
           "type": ["null", "string"]
         },
+        "tipo_do_lead": {
+          "type": ["null", "string"]
+        },
         "impacto_de_email_marketing_em_mql__abertura_": {
           "type": ["null", "string"]
         },
