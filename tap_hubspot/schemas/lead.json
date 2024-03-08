@@ -558,6 +558,29 @@
     },
     "archived": {
       "type": "boolean"
+    },
+    "associations": {
+      "type": ["null", "object"],
+      "properties": {
+        "contactIds": {
+          "type": ["null", "array"],
+          "items": {
+            "type": ["null", "integer"]
+          }
+        },
+        "companyIds": {
+          "type": ["null", "array"],
+          "items": {
+            "type": ["null", "integer"]
+          }
+        },
+        "dealIds": {
+          "type": ["null", "array"],
+          "items": {
+            "type": ["null", "integer"]
+          }
+        }
+      }
     }
   }
 }
