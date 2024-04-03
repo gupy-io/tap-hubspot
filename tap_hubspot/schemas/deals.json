@@ -30,6 +30,12 @@
           "items": {
             "type": ["null", "integer"]
           }
+        },
+        "associatedLeadIds": {
+          "type": ["null", "array"],
+          "items": {
+            "type": ["null", "integer"]
+          }
         }
       }
     }

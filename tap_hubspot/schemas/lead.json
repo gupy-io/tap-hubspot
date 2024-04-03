@@ -545,6 +545,18 @@
         },
         "property_c_e___negocio__quantidade_de_licencas": {
           "type": ["null", "number", "string"]
+        },
+        "property_email_de_dominio_gratuito": {
+          "type": ["null", "string"]
+        },
+        "utm_campaign": {
+          "type": ["null", "string"]
+        },
+        "detalhamento_da_fonte_mais_recente_1": {
+          "type": ["null", "string"]
+        },
+        "c_e_motivo_da_desqualificacao": {
+          "type": ["null", "string"]
         }
       }
     },
