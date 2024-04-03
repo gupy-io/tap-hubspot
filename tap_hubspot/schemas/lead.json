@@ -546,7 +546,7 @@
         "property_c_e___negocio__quantidade_de_licencas": {
           "type": ["null", "number", "string"]
         },
-        "property_email_de_dominio_gratuito": {
+        "email_de_dominio_gratuito": {
           "type": ["null", "string"]
         },
         "utm_campaign": {
