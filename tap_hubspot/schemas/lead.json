@@ -552,7 +552,7 @@
         "cs_da_empresa___patagonia": {
           "type": ["null", "string"]
         },
-        "property_conteudo_do_evento": {
+        "conteudo_do_evento": {
           "type": ["null", "string"]
         },
         "fonte_do_evento": {
@@ -682,12 +682,6 @@
           "type": ["null", "string"]
         },
         "tier_da_lm": {
-          "type": ["null", "string"]
-        },
-        "associations.1-81": {
-          "type": ["null", "string"]
-        },
-        "associations.1-83": {
           "type": ["null", "string"]
         },
         "data_da_ultima_atividade_do_contato": {
