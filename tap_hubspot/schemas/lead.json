@@ -552,7 +552,7 @@
         "cs_da_empresa___patagonia": {
           "type": ["null", "string"]
         },
-        "conteudo_do_evento": {
+        "property_conteudo_do_evento": {
           "type": ["null", "string"]
         },
         "fonte_do_evento": {
