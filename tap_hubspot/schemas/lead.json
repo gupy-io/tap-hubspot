@@ -546,16 +546,154 @@
         "property_c_e___negocio__quantidade_de_licencas": {
           "type": ["null", "number", "string"]
         },
+        "edcorp__cs_da_empresa": {
+          "type": ["null", "string"]
+        },
+        "cs_da_empresa___patagonia": {
+          "type": ["null", "string"]
+        },
+        "conteudo_do_evento": {
+          "type": ["null", "string"]
+        },
+        "fonte_do_evento": {
+          "type": ["null", "string"]
+        },
+        "inteligencia_comercial__lead_trabalhado_pelo_ldr_": {
+          "type": ["null", "string"]
+        },
+        "ultima_data_de_atribuicao_de_ldr": {
+          "type": ["null", "string"]
+        },
+        "c_e_motivo_da_desqualificacao": {
+          "type": ["null", "string"]
+        },
+        "nome_da_campanha___ads": {
+          "type": ["null", "string"]
+        },
         "email_de_dominio_gratuito": {
           "type": ["null", "string"]
         },
-        "utm_campaign": {
+        "atribucao_mql": {
+          "type": ["null", "string"]
+        },
+        "classificacao_da_lm": {
+          "type": ["null", "string"]
+        },
+        "fonte_mais_recente": {
+          "type": ["null", "string"]
+        },
+        "r_s__macro_motivo_de_desqualificacao": {
+          "type": ["null", "string"]
+        },
+        "adm__macromotivo_de_desqualificacao": {
+          "type": ["null", "string"]
+        },
+        "edcorp__macromotivo_de_desqualificacao": {
+          "type": ["null", "string"]
+        },
+        "c_e__macromotivo_de_desqualificacao": {
+          "type": ["null", "string"]
+        },
+        "r_s__classificacao_do_mql": {
+          "type": ["null", "string"]
+        },
+        "adm__classificacao_do_mql": {
+          "type": ["null", "string"]
+        },
+        "edc__classificacao_do_mql": {
+          "type": ["null", "string"]
+        },
+        "c_e__classificacao_do_mql": {
+          "type": ["null", "string"]
+        },
+        "detalhamento_da_fonte_original_1": {
+          "type": ["null", "string"]
+        },
+        "detalhamento_da_fonte_original_2": {
+          "type": ["null", "string"]
+        },
+        "content": {
+          "type": ["null", "string"]
+        },
+        "tipo_de_levantada_de_mao": {
           "type": ["null", "string"]
         },
         "detalhamento_da_fonte_mais_recente_1": {
           "type": ["null", "string"]
         },
-        "c_e_motivo_da_desqualificacao": {
+        "detalhamento_da_fonte_mais_recente_2": {
+          "type": ["null", "string"]
+        },
+        "utm_campaign": {
+          "type": ["null", "string"]
+        },
+        "utm_campaign_concat": {
+          "type": ["null", "string"]
+        },
+        "utm_campaign_original": {
+          "type": ["null", "string"]
+        },
+        "utm_content": {
+          "type": ["null", "string"]
+        },
+        "utm_content_concat": {
+          "type": ["null", "string"]
+        },
+        "utm_content_original": {
+          "type": ["null", "string"]
+        },
+        "utm_medium": {
+          "type": ["null", "string"]
+        },
+        "utm_medium_original": {
+          "type": ["null", "string"]
+        },
+        "utm_medium_concat": {
+          "type": ["null", "string"]
+        },
+        "utm_source": {
+          "type": ["null", "string"]
+        },
+        "utm_source_concat": {
+          "type": ["null", "string"]
+        },
+        "utm_source_original": {
+          "type": ["null", "string"]
+        },
+        "utm_term": {
+          "type": ["null", "string"]
+        },
+        "utm_term_concat": {
+          "type": ["null", "string"]
+        },
+        "utm_term_original": {
+          "type": ["null", "string"]
+        },
+        "utm_version": {
+          "type": ["null", "string"]
+        },
+        "qual_o_seu_cargo_atual_": {
+          "type": ["null", "string"]
+        },
+        "ultimo_form_submit___url": {
+          "type": ["null", "string"]
+        },
+        "data_de_conversao_recente": {
+          "type": ["null", "string"]
+        },
+        "tier_da_lm": {
+          "type": ["null", "string"]
+        },
+        "associations.1-81": {
+          "type": ["null", "string"]
+        },
+        "associations.1-83": {
+          "type": ["null", "string"]
+        },
+        "data_da_ultima_atividade_do_contato": {
+          "type": ["null", "string"]
+        },
+        "p_d__classificacao_do_mql": {
           "type": ["null", "string"]
         }
       }
