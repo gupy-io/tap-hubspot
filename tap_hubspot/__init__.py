@@ -76,7 +76,7 @@ ENDPOINTS = {
     
     "lead":                      "/crm/v3/objects/p3299491_lead",
     "lead_properties":           "/crm/v3/properties/p3299491_lead",
-    "lead_by_deals_v3":          "/crm/v3/associations/lead/deals/batch/read",
+    "lead_by_deals_v3":          "/crm/v3/associations/p3299491_lead/deals/batch/read",
 
     "products_all":             "/crm-objects/v1/objects/products/paged",
     "products_properties":      "/properties/v1/products/properties",
