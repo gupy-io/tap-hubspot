@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "properties": {
+        "lead-id": {
+            "type": ["integer"]
+        },
+        "deals-id": {
+            "type": ["integer"]
+        }
+    },
+    "additionalProperties": false
+}

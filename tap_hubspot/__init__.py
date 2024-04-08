@@ -43,6 +43,7 @@ class StateFields:
 BASE_URL = "https://api.hubapi.com"
 
 CONTACTS_BY_COMPANY = "contacts_by_company"
+LEAD_BY_DEALS = "lead_by_deals"
 
 DEFAULT_CHUNK_SIZE = 1000 * 60 * 60 * 24
 
@@ -75,6 +76,7 @@ ENDPOINTS = {
     
     "lead":                      "/crm/v3/objects/p3299491_lead",
     "lead_properties":           "/crm/v3/properties/p3299491_lead",
+    "lead_by_deals_v3":          "/crm/v3/associations/lead/deals/batch/read",
 
     "products_all":             "/crm-objects/v1/objects/products/paged",
     "products_properties":      "/properties/v1/products/properties",
@@ -1291,7 +1293,8 @@ def sync_lead(STATE, ctx):
     ''' Add params getting from /crm/v3/properties/p3299491_lead '''    
     params = {'limit': 100}
     params["properties"] = ",".join(get_params_from_properties('p3299491_lead'))
-        
+    
+    lead_ids = []
     url = get_url('lead')
     with Transformer(NO_INTEGER_DATETIME_PARSING) as bumble_bee:
         for row in gen_request_v3(STATE, 'lead', url, params, 'results'):
@@ -1301,10 +1304,50 @@ def sync_lead(STATE, ctx):
             if not modified_time or modified_time >= start:                
                 record = bumble_bee.transform(row, schema, mdata)
                 singer.write_record("lead", record, catalog.get('stream_alias'), time_extracted=utils.now())
+            
+            if LEAD_BY_DEALS in ctx.selected_stream_ids:
+                # Collect the recently modified lead id
+                if not modified_time or modified_time >= start:
+                    lead_ids.append(row['leadId'])
+
+            if len(lead_ids) >= default_company_params['limit']:
+                STATE = _sync_associations_lead_deals_v3(STATE, ctx, lead_ids)
+                lead_ids = []    # reset the list
+    
+    # Extract the records for last remaining company ids
+    if LEAD_BY_DEALS in ctx.selected_stream_ids:
+        STATE = _sync_associations_lead_deals_v3(STATE, ctx, lead_ids)
+        STATE = singer.clear_offset(STATE, "lead_by_deals")
 
     STATE = singer.write_bookmark(STATE, 'lead', bookmark_key, max_bk_value)
     singer.write_state(STATE)
     return STATE
+
+def _sync_associations_lead_deals_v3(STATE, ctx, lead_ids):
+    # Return state as it is if lead ids list is empty
+    if len(lead_ids) == 0:
+        return STATE
+
+    schema = load_schema(LEAD_BY_DEALS)
+    catalog = ctx.get_catalog_from_id(singer.get_currently_syncing(STATE))
+    mdata = metadata.to_map(catalog.get('metadata'))
+    url = get_url("lead_by_deals_v3")
+
+    with Transformer(UNIX_MILLISECONDS_INTEGER_DATETIME_PARSING) as bumble_bee:
+        with metrics.record_counter(LEAD_BY_DEALS) as counter:
+            body = {'inputs': [{'id': lead_id} for lead_id in lead_ids]}
+            lead_to_deals_rows = post_search_endpoint(url, body).json()
+            for row in lead_to_deals_rows['results']:
+                for lead in row['to']:
+                    counter.increment()
+                    record = {'lead-id' : row['from']['id'],
+                              'deals-id' : lead['id']}
+                    record = bumble_bee.transform(lift_properties_and_versions(record), schema, mdata)
+                    singer.write_record("lead_by_deals", record, time_extracted=utils.now())
+    STATE = singer.set_offset(STATE, "lead_by_deals", 'offset', lead_ids[-1])
+    singer.write_state(STATE)
+    return STATE
+
 
 @attr.s
 class Stream:
@@ -1322,6 +1365,7 @@ STREAMS = [
     Stream('deals', sync_deals, ["dealId"], 'property_hs_lastmodifieddate', 'INCREMENTAL'),
     Stream('companies', sync_companies, ["companyId"], 'property_hs_lastmodifieddate', 'INCREMENTAL'),
     Stream('lead', sync_lead, ["id"], 'updatedAt', 'INCREMENTAL'),
+    Stream('lead_by_deals', _sync_associations_lead_deals_v3, ["id"], 'updatedAt', 'FULL_TABLE'),
     # Do these last as they are full table
     Stream('associations_line_items_deals_v3', sync_associations_line_items_deals_v3, ['id'], 'updatedAt', 'FULL_TABLE'),
     Stream('line_items', sync_line_items, ['objectId'], 'hs_lastmodifieddate', 'FULL_TABLE'),
