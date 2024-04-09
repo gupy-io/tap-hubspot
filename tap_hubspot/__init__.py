@@ -1289,7 +1289,7 @@ def sync_lead(STATE, ctx):
     LOGGER.info("sync_lead_v3 from %s", start)
 
     ''' Add params getting from /crm/v3/properties/p3299491_lead '''    
-    params = {'limit': 100}
+    params = {'limit': 100, 'associations': 'deals'}
     params["properties"] = ",".join(get_params_from_properties('p3299491_lead'))
         
     url = get_url('lead')
