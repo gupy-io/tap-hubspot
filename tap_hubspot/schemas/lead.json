@@ -702,6 +702,32 @@
     },
     "archived": {
       "type": "boolean"
+    },
+    "associations": {
+      "type": "object",
+      "properties": {
+        "deals": {
+          "type": "object",
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
     }
   }
 }
